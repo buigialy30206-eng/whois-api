@@ -4,7 +4,7 @@ RDAP protocol (RFC 7480) — modern, JSON, free, no rate limits.
 """
 import subprocess, json as _json, time, threading
 from typing import Optional
-from fastapi import Query
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ratelimit import RateLimitMiddleware
