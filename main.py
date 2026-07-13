@@ -8,10 +8,8 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-
 app = FastAPI(title="Domain WHOIS API", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
 
 # RDAP servers for common TLDs
 RDAP_SERVERS = {
@@ -33,7 +31,6 @@ _cache: dict = {}
 _cache_lock = threading.Lock()
 CACHE_TTL = 3600  # 1 hour
 
-
 class WhoisResult(BaseModel):
     domain: str
     registrar: Optional[str] = None
@@ -44,7 +41,6 @@ class WhoisResult(BaseModel):
     status: list[str] = []
     available: Optional[bool] = None
     error: Optional[str] = None
-
 
 def curl_get(url: str, timeout: int = 6) -> dict:
     """curl with strict timeout. Returns {} on any failure."""
@@ -65,14 +61,12 @@ def curl_get(url: str, timeout: int = 6) -> dict:
     except:
         return {}
 
-
 def get_cached(key: str):
     with _cache_lock:
         entry = _cache.get(key)
         if entry and time.time() - entry["ts"] < CACHE_TTL:
             return entry["data"]
     return None
-
 
 def set_cache(key: str, data):
     with _cache_lock:
@@ -81,7 +75,6 @@ def set_cache(key: str, data):
         if len(_cache) > 1000:
             oldest = min(_cache, key=lambda k: _cache[k]["ts"])
             del _cache[oldest]
-
 
 def parse_rdap(domain: str, data: dict) -> WhoisResult:
     registrar = None
@@ -117,7 +110,6 @@ def parse_rdap(domain: str, data: dict) -> WhoisResult:
         status=status,
         available=False,
     )
-
 
 def lookup_rdap(domain: str) -> WhoisResult:
     domain = domain.lower().strip()
@@ -160,16 +152,13 @@ def lookup_rdap(domain: str) -> WhoisResult:
     # Don't cache failures
     return result
 
-
 @app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok", "protocol": "RDAP", "cache_size": len(_cache)}
 
-
 @app.get("/")
 async def root():
     return {"service": "Domain WHOIS API", "version": "2.0.0"}
-
 
 @app.get("/lookup", response_model=WhoisResult)
 async def lookup(domain: str = Query(..., description="Domain name, e.g. 'example.com'")):
