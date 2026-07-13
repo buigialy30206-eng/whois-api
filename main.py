@@ -7,11 +7,9 @@ from typing import Optional
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from ratelimit import RateLimitMiddleware
 
 app = FastAPI(title="Domain WHOIS API", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-app.add_middleware(RateLimitMiddleware)
 
 # RDAP servers for common TLDs
 RDAP_SERVERS = {
