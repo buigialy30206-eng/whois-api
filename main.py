@@ -159,7 +159,7 @@ def lookup_rdap(domain: str) -> WhoisResult:
     return result
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok", "protocol": "RDAP", "cache_size": len(_cache)}
 
